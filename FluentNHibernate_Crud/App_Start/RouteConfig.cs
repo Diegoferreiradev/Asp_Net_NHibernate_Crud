@@ -16,7 +16,7 @@ namespace FluentNHibernate_Crud
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "Aluno", action = "Index", id = UrlParameter.Optional }
             );
         }
     }
