@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FluentNHibernate_Crud.Models;
+using NHibernate;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,13 +13,22 @@ namespace FluentNHibernate_Crud.Controllers
         // GET: Aluno
         public ActionResult Index()
         {
-            return View();
+            using (ISession session = NHibernateHelper.OpenSession())
+            {
+                var alunos = session.Query<Aluno>().ToList();
+                return View(alunos);
+            }
+
         }
 
         // GET: Aluno/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            using (ISession session = NHibernateHelper.OpenSession())
+            {
+                var aluno = session.Get<Aluno>(id);
+                return View(aluno);
+            }
         }
 
         // GET: Aluno/Create
@@ -28,13 +39,20 @@ namespace FluentNHibernate_Crud.Controllers
 
         // POST: Aluno/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Create(Aluno aluno)
         {
             try
             {
-                // TODO: Add insert logic here
+                using (ISession session = NHibernateHelper.OpenSession())
+                {
+                    using (ITransaction transaction = session.BeginTransaction())
+                    {
+                        session.Save(aluno);
+                        transaction.Commit();
+                    }
+                }
 
-                return RedirectToAction("Index");
+                    return RedirectToAction("Index");
             }
             catch
             {
@@ -45,18 +63,36 @@ namespace FluentNHibernate_Crud.Controllers
         // GET: Aluno/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            using (ISession session = NHibernateHelper.OpenSession())
+            {
+                var aluno = session.Get<Aluno>(id);
+                return View(aluno);
+            }
         }
 
         // POST: Aluno/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(int id, Aluno aluno)
         {
             try
             {
-                // TODO: Add update logic here
+                using (ISession session = NHibernateHelper.OpenSession())
+                {
+                    var alterarAluno = session.Get<Aluno>(id);
 
-                return RedirectToAction("Index");
+                    alterarAluno.Nome = aluno.Nome;
+                    alterarAluno.Email = aluno.Email;
+                    alterarAluno.Curso = aluno.Curso;
+                    alterarAluno.Sexo = aluno.Sexo;
+
+                    using (ITransaction transaction = session.BeginTransaction())
+                    {
+                        session.Save(alterarAluno);
+                        transaction.Commit();
+                    }
+                }
+
+                    return RedirectToAction("Index");
             }
             catch
             {
@@ -67,18 +103,32 @@ namespace FluentNHibernate_Crud.Controllers
         // GET: Aluno/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            using (ISession session = NHibernateHelper.OpenSession())
+            {
+                var aluno = session.Get<Aluno>(id);
+                return View(aluno);
+            }
+
+                
         }
 
         // POST: Aluno/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(int id, Aluno aluno)
         {
             try
             {
-                // TODO: Add delete logic here
+                using (ISession session = NHibernateHelper.OpenSession())
+                {
+                    using (ITransaction transaction = session.BeginTransaction())
+                    {
+                        session.Delete(aluno);
+                        transaction.Commit();
+                    }
 
-                return RedirectToAction("Index");
+                }
+
+                    return RedirectToAction("Index");
             }
             catch
             {
